@@ -98,11 +98,15 @@
                                 <input type="number" id="manual-input" min="0" max="100" step="1" placeholder="0">
                                 <span>%</span>
                             </div>
+
                             <div id="error-message" class="error"></div>
+
                             <div class="manual-buttons">
                                 <button id="open-door" class="btn-open">Ouvrir la porte</button>
                                 <button id="close-door" class="btn-close">Fermer la porte</button>
                             </div>
+
+                            <div id="post-message"></div>
                         </div>
                     </div>
                 </div>
@@ -208,50 +212,67 @@
         });
 
         function sendCommand(command, value = null) {
+            const postMessage = document.getElementById("post-message");
+
             fetch("/api/command", {
                 method: "POST",
                 headers: {
-                "Content-Type": "application/json"
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ command, value })
+            })
+            .then(async res => {
+                // result returned from azure
+                const result = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(result.error || "Erreur lors de l'envoi de la commande");
+                }
+
+                postMessage.style.color = "green";
+                postMessage.textContent = "Commande envoyée avec succès !";
+            })
+            .catch(error => {
+                postMessage.style.color = "red";
+                postMessage.textContent = error.message || "Erreur lors de l'envoi de la commande !";
+                console.error(error);
             });
-            }
+        }
 
-            document.getElementById("open-door").onclick = () => {
-                sendCommand("open");
-            };
+        document.getElementById("open-door").onclick = () => {
+            sendCommand("open");
+        };
 
-            document.getElementById("close-door").onclick = () => {
-                document.getElementById("manual-input").value = 0;
-                document.getElementById("error-message").textContent = "";
+        document.getElementById("close-door").onclick = () => {
+            document.getElementById("manual-input").value = 0;
+            document.getElementById("error-message").textContent = "";
 
-                sendCommand("close");
-            };
+            sendCommand("close");
+        };
 
-            document.getElementById("manual-input").addEventListener("change", (e) => {
-                const value = parseInt(e.target.value);
-                const errorMessage = document.getElementById("error-message");
+        document.getElementById("manual-input").addEventListener("change", (e) => {
+            const value = parseInt(e.target.value);
+            const errorMessage = document.getElementById("error-message");
 
-                if (isNaN(value)) {
-                    errorMessage.textContent = "";
-                    return;
-                }
-
-                if (value > 100) {
-                    errorMessage.textContent = "Le pourcentage ne peut pas dépasser 100%.";
-                    return;
-                }
-
-                if (value < 0) {
-                    errorMessage.textContent = "Le pourcentage ne peut pas être inférieur à 0%.";
-                    return;
-                }
-
+            if (isNaN(value)) {
                 errorMessage.textContent = "";
-
-                sendCommand("set", value);
+                return;
             }
-        );
+
+            if (value > 100) {
+                errorMessage.textContent = "Le pourcentage ne peut pas dépasser 100%.";
+                return;
+            }
+
+            if (value < 0) {
+                errorMessage.textContent = "Le pourcentage ne peut pas être inférieur à 0%.";
+                return;
+            }
+
+            errorMessage.textContent = "";
+
+            sendCommand("set", value);
+        });
 
         function updateDoorGraphic(opening) {
             const percent = Math.max(0, Math.min(100, Math.round(Number(opening) || 0)));
