@@ -1,11 +1,12 @@
 services:
   webserver:
     image: cybercertif/apache-php-mysql
-    platform: linux/amd64
     restart: always
     ports:
       - "9999:80"
     depends_on:
+      - db
+    links:
       - db
     volumes:
       - ./myweb:/var/www/html
@@ -16,19 +17,18 @@ services:
     ports:
       - "7777:80"
     environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
+      - PMA_HOST=db   
     depends_on:
+      - db
+    links:
       - db
 
   db:
-    image: mysql:latest
-    platform: linux/amd64
-    environment:
-      MYSQL_ROOT_PASSWORD: adadad
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pass
-      MYSQL_DATABASE: db_objet
+    image: mysql:8.0  
     restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=adadad
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pass
     volumes:
       - ./mydb:/var/lib/mysql
