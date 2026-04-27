@@ -99,11 +99,15 @@
                                 <input type="number" id="manual-input" min="0" max="100" step="1" placeholder="0">
                                 <span>%</span>
                             </div>
+
                             <div id="error-message" class="error"></div>
+
                             <div class="manual-buttons">
                                 <button id="open-door" class="btn-open">Ouvrir la porte</button>
                                 <button id="close-door" class="btn-close">Fermer la porte</button>
                             </div>
+
+                            <div id="post-message"></div>
                         </div>
                     </div>
                 </div>
@@ -183,33 +187,41 @@
             });
 
         function sendCommand(command, value = null) {
+            const postMessage = document.getElementById("post-message");
+
             fetch("/api/command", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ command, value })
+            })
+            .then(async res => {
+                // result returned from azure
+                const result = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(result.error || "Erreur lors de l'envoi de la commande");
+                }
+
+                postMessage.style.color = "green";
+                postMessage.textContent = "Commande envoyée avec succès !";
+            })
+            .catch(error => {
+                postMessage.style.color = "red";
+                postMessage.textContent = error.message || "Erreur lors de l'envoi de la commande !";
+                console.error(error);
             });
         }
 
         document.getElementById("open-door").onclick = () => {
-            if (currentMode === "auto") {
-                document.getElementById("error-message").textContent =
-                    "Passe en mode manuel pour contrôler.";
-                return;
-            }
             sendCommand("open");
         };
 
         document.getElementById("close-door").onclick = () => {
-            if (currentMode === "auto") {
-                document.getElementById("error-message").textContent =
-                    "Passe en mode manuel pour contrôler.";
-                return;
-            }
-
             document.getElementById("manual-input").value = 0;
             document.getElementById("error-message").textContent = "";
+
             sendCommand("close");
         };
 
