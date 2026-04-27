@@ -23,6 +23,7 @@ services:
 
   db:
     image: mysql:latest
+    platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: adadad
       MYSQL_USER: user
