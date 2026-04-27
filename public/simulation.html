@@ -63,7 +63,7 @@
                                 <h4>
                                     Luminosité
                                 </h4>
-                                <p id="luminosite">-- (80-100)</p>
+                                <p id="luminosite">-- (0-100)</p>
                             </div>
 
                             <div class="info-section">
@@ -178,7 +178,7 @@
 
             // TOP INFO
             document.getElementById("temperature").textContent = (latest.Body.temperature ?? "--") + " °C";
-            document.getElementById("luminosite").textContent = (latest.Body.luminosite ?? "--") + " (80-100)";
+            document.getElementById("luminosite").textContent = (latest.Body.luminosite ?? "--") + " (0-100)";
             document.getElementById("distance").textContent = (latest.Body.distance ?? "--") + " cm";
             document.getElementById("mode").textContent = latest.Body.mode ?? "--";
             document.getElementById("mode-title").textContent = latest.Body.mode ?? "--";
