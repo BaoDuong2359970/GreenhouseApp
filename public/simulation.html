@@ -197,8 +197,12 @@
                 body: JSON.stringify({ command, value })
             })
             .then(async res => {
-                // result returned from azure
-                const result = await res.json();
+                let result = {};
+                try {
+                    result = await res.json();
+                } catch {
+                    result = {};
+                }
 
                 if (!res.ok) {
                     throw new Error(result.error || "Erreur lors de l'envoi de la commande");
