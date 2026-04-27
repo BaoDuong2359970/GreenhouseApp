@@ -1,6 +1,6 @@
 services:
   webserver:
-    image: cybercertif/apache-php-mysql
+    image: php:8.2-apache
     restart: always
     ports:
       - "9999:80"
