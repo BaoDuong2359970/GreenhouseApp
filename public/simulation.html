@@ -221,9 +221,12 @@
                 },
                 body: JSON.stringify({ command, value })
             })
-            .then(res => {
+            .then(async res => {
+                // result returned from azure
+                const result = await res.json();
+
                 if (!res.ok) {
-                    throw new Error("Erreur lors de l'envoi de la commande");
+                    throw new Error(result.error || "Erreur lors de l'envoi de la commande");
                 }
 
                 postMessage.style.color = "green";
