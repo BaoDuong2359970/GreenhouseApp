@@ -377,3 +377,15 @@ h4 {
     display: flex;
     flex-direction: column;
 }
+
+.warning-line {
+    display: none;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #fff3cd;
+    border: 2px solid #ffcc00;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    color: #5c4600;
+}

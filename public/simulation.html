@@ -63,7 +63,7 @@
                                 <h4>
                                     Luminosité
                                 </h4>
-                                <p id="luminosite">-- (80-100)</p>
+                                <p id="luminosite">-- (0-100)</p>
                             </div>
 
                             <div class="info-section">
@@ -107,6 +107,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="warning-line" id="warning-line">
+            <p id="warning-message"></p>
         </div>
 
         <div class="historique-section" id="historique">
@@ -178,12 +182,14 @@
 
             // TOP INFO
             document.getElementById("temperature").textContent = (latest.Body.temperature ?? "--") + " °C";
-            document.getElementById("luminosite").textContent = (latest.Body.luminosite ?? "--") + " (80-100)";
+            document.getElementById("luminosite").textContent = (latest.Body.luminosite ?? "--") + " (0-100)";
             document.getElementById("distance").textContent = (latest.Body.distance ?? "--") + " cm";
             document.getElementById("mode").textContent = latest.Body.mode ?? "--";
             document.getElementById("mode-title").textContent = latest.Body.mode ?? "--";
 
             updateDoorGraphic(currentOpening);
+            
+            updateWarning(latest.Body);
             
             // TABLE
             const table = document.getElementById("historique-body");
@@ -263,6 +269,25 @@
 
             document.getElementById("ouverture-graphic").textContent = percent + "%";
             document.getElementById("ouverture-info").textContent = percent + "%";
+        }
+
+        function updateWarning(body) {
+            const warningLine = document.getElementById("warning-line");
+            const warningMessage = document.getElementById("warning-message");
+
+            const ouvertureCible = Number(body.ouverture_auto ?? 0);
+            const ouvertureReelle = Number(body.ouverture_reelle ?? 0);
+            const difference = Math.abs(ouvertureCible - ouvertureReelle);
+
+            if (difference > 5) {
+                warningMessage.textContent = 
+                    `Alerte : déviation détectée entre l'ouverture calculée (${Math.round(ouvertureCible)}%) et l'ouverture réelle (${Math.round(ouvertureReelle)}%).`;
+
+                warningLine.style.display = "block";
+            } else {
+                warningMessage.textContent = "";
+                warningLine.style.display = "none";
+            }
         }
     </script>
 </body>
